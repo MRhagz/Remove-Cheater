@@ -18,7 +18,7 @@ class Course {
     void dynamic_resize() {
         if (size == capacity)
             capacity += ceil(capacity * .5);
-        else if (size == capacity * 2.0/3 && capacity != 5)
+        else if (size <= capacity * 2.0/3 && capacity != 5)
             capacity -= floor(capacity * .25);
         else
             return;
@@ -39,17 +39,11 @@ class Course {
     void remove (int pos) {
         free(students[pos-1]);
         shiftElements(pos);
+        size--;
     }
 
-    // check if student is blocklisted
-    bool isCheater (Student* s) const {
-        for (int i = 0; i < size; i++) {
-            if (students[i]->year == s->year && students[i]->program == s->program) {
-                return true;
-            }
-        }
-        return false;
-    }
+    // checks if student is blocklisted
+
 
 public:
     explicit Course (string title) : size(0), capacity(5) {
@@ -59,6 +53,7 @@ public:
     }
 
     int add (Student* s) {
+        cout << "ADDING " << s->name << endl;
         if (cheaters != nullptr && cheaters->isCheater(s))
             return -1;
         dynamic_resize();
@@ -69,6 +64,15 @@ public:
             }
         }
         return 0;
+    }
+
+    bool isCheater (Student* s) const {
+        for (int i = 0; i < size; i++) {
+            if (students[i]->year == s->year && students[i]->program == s->program) {
+                return true;
+            }
+        }
+        return false;
     }
 
     int removeCheater (Student* s) {
@@ -116,10 +120,9 @@ public:
     }
     ~Course() {
         delete(cheaters);
-        if (students != nullptr) {
-            for (int i = 0; i < size; i++)
-                free(students[i]);
-        }
+
+        for (int i = 0; i < size; i++)
+            free(students[i]);
 
         free(students);
 
@@ -131,10 +134,3 @@ public:
 
 #endif //COURSE_H
 
-// echo "# Remove-Cheater" >> README.md
-// git init
-// git add README.md
-// git commit -m "first commit"
-// git branch -M main
-// git remote add origin https://github.com/MRhagz/Remove-Cheater.git
-// git push -u origin main
